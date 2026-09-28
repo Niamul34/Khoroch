@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Khoroch — Student Money Management & Budgeting</title>
+  <meta name="description" content="Modern, fast, student-first personal finance app. Master your monthly allowance, stay within safe daily spending limits, track expenses, and grow your savings.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="assets/logo.jpg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="assets/logo.jpg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Khoroch">
+  <meta name="theme-color" content="#090d16">
+</head>
+<body>
+
+  <!-- Master App Viewport Container -->
+  <div class="app-viewport" id="appViewport">
+    <div class="app-container" id="appContainer">
+
+      <!-- Top Header Navigation -->
+      <header class="app-header">
+        <div class="brand-section">
+          <div class="brand-logo" id="brandLogo">
+            <img src="assets/logo.jpg" alt="Khoroch Logo" style="width:100%; height:100%; border-radius:inherit; object-fit:cover;">
+          </div>
+          <div>
+            <div class="brand-title">Khoroch</div>
+            <div class="brand-subtitle">
+              <span id="headerMonthDisplay">September 2026</span>
+              <button class="month-selector" id="btnChangeMonth" title="Change or Reset Month">
+                <span>🗓️</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Quick Afford Tool Button -->
+          <button class="icon-btn" id="btnHeaderAfford" title="Can I Afford This? Calculator">
+            <span>🤔</span>
+          </button>
+          <!-- View Mode Toggle (Mobile Frame vs Wide Screen) -->
+          <button class="icon-btn" id="btnToggleViewMode" title="Toggle Desktop Wide View / Mobile Phone View">
+            <span id="viewModeIcon">📱</span>
+          </button>
+          <!-- Theme Toggle (Dark / Light) -->
+          <button class="icon-btn" id="btnToggleTheme" title="Toggle Light/Dark Theme">
+            <span id="themeIcon">☀️</span>
+          </button>
+          <!-- Notifications Center / Settings -->
+          <button class="icon-btn" id="btnHeaderSettings" title="Settings & Security">
+            <span>⚙️</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Scrollable Views Content -->
+      <main class="main-content" id="mainContent">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: HOME (Main Dashboard)               -->
+        <!-- ========================================== -->
+        <section class="tab-view active" id="view-home">
+          <!-- Health Status Banner -->
+          <div class="health-banner good" id="healthBanner">
+            <span class="health-icon" id="healthIcon">🟢</span>
+            <div class="health-text" id="healthMessage">
+              Calculating your budget health...
+            </div>
+          </div>
+
+          <!-- Hero Balance Card -->
+          <div class="card hero-card" id="widget-balance-card">
+            <div class="hero-header">
+              <span class="hero-label">Available to Spend</span>
+              <span class="afford-badge badge-green" id="heroBadge">🟢 On Track</span>
+            </div>
+            <div class="hero-amount" id="heroAvailableMoney">৳0</div>
+            
+            <div class="hero-meta-row">
+              <div class="hero-meta-item">
+                <div class="hero-meta-title">Monthly Income</div>
+                <div class="hero-meta-val green" id="heroIncome">৳0</div>
+              </div>
+              <div class="hero-meta-item">
+                <div class="hero-meta-title">Total Spent</div>
+                <div class="hero-meta-val red" id="heroSpent">৳0</div>
+              </div>
+              <div class="hero-meta-item">
+                <div class="hero-meta-title">Protected Savings</div>
+                <div class="hero-meta-val blue" id="heroSavings">৳0</div>
+              </div>
+              <div class="hero-meta-item">
+                <div class="hero-meta-title">Reserved Bills</div>
+                <div class="hero-meta-val amber" id="heroReservedBills">৳0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Safe Daily Spending Limit Card -->
+          <div class="card daily-limit-card" id="widget-daily-limit">
+            <div class="daily-limit-left">
+              <span class="daily-limit-label">
+                <span>⚡</span> Safe Daily Spending Limit
+              </span>
+              <span class="daily-limit-value" id="safeDailyLimitVal">৳0/day</span>
+              <span class="daily-limit-sub" id="dailyLimitSub">Based on usable money & remaining days</span>
+            </div>
+            <div class="daily-meter">
+              <div class="hero-meta-title">Today's Spent</div>
+              <div class="daily-meter-val" id="todaySpentVal">৳0</div>
+              <div class="hero-meta-title" id="daysRemainingText">12 days left</div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons Strip -->
+          <div class="quick-actions-bar">
+            <button class="action-chip" id="chipAddIncome">
+              <span>➕</span> Add Income
+            </button>
+            <button class="action-chip" id="chipAfford">
+              <span>🤔</span> Can I Afford?
+            </button>
+            <button class="action-chip" id="chipTransfer">
+              <span>🔄</span> Transfer Money
+            </button>
+            <button class="action-chip" id="chipNewMonth">
+              <span>🗓️</span> New Month
+            </button>
+          </div>
+
+          <!-- Quick Daily Spending Chart Sneak Peek -->
+          <div class="card" id="widget-spending-chart">
+            <div class="section-header" style="margin-top:0;">
+              <span class="section-title">📊 Daily Spending Pace</span>
+              <button class="section-link" id="linkViewFullAnalytics">Full Analytics</button>
+            </div>
+            <canvas id="homeDailyChart" height="150" style="width:100%; height:150px;"></canvas>
+          </div>
+
+          <!-- Category Budget Overview -->
+          <div class="section-header">
+            <span class="section-title">📁 Top Category Budgets</span>
+            <button class="section-link" id="linkViewAllBudgets">Manage All</button>
+          </div>
+          <div id="homeCategoryList">
+            <!-- Dynamically populated category budget items -->
+          </div>
+
+          <!-- Upcoming Bills Preview -->
+          <div class="section-header">
+            <span class="section-title">🔔 Upcoming Bills & Fixed Dues</span>
+            <button class="section-link" id="linkViewAllBills">Add Bill</button>
+          </div>
+          <div id="homeBillsList">
+            <!-- Dynamically populated upcoming bills -->
+          </div>
+
+          <!-- Recent Transactions Preview -->
+          <div class="section-header">
+            <span class="section-title">🕒 Recent Transactions</span>
+            <button class="section-link" id="linkViewAllTransactions">View All</button>
+          </div>
+          <div id="homeTransactionsList">
+            <!-- Dynamically populated recent transactions -->
+          </div>
+
+          <!-- Savings Goals Sneak Peek -->
+          <div class="section-header">
+            <span class="section-title">🎯 Savings & Emergency Goals</span>
+            <button class="section-link" id="linkViewAllGoals">All Goals</button>
+          </div>
+          <div id="homeGoalsList">
+            <!-- Dynamically populated savings goals -->
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: BUDGET (Allocation & Planning)      -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-budget">
+          <div class="card" style="background: var(--accent-card-gradient), var(--bg-card); border-color: rgba(99, 102, 241, 0.3);">
+            <div class="section-header" style="margin-top:0;">
+              <span class="section-title">📑 Monthly Budget Planning</span>
+              <button class="btn-mini" id="btnEditMonthlyAllowance">Edit Allowance</button>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;">
+              <div>
+                <div class="hero-meta-title">TOTAL INCOME</div>
+                <div style="font-size:22px; font-weight:800; color:var(--text-primary);" id="budgetScreenTotalIncome">৳20,000</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="hero-meta-title">TOTAL ALLOCATED</div>
+                <div style="font-size:18px; font-weight:700; color:var(--color-blue);" id="budgetScreenTotalAllocated">৳18,500</div>
+              </div>
+            </div>
+
+            <!-- Allocation Progress Bar -->
+            <div class="progress-bar-container" style="height: 10px; margin-bottom: 8px;">
+              <div class="progress-bar-fill" id="budgetAllocationFill" style="background: var(--accent-gradient); width: 92%;"></div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600;">
+              <span id="budgetScreenUnallocatedText">Unallocated: ৳1,500</span>
+              <span id="budgetScreenAllocatedPercent">92% Allocated</span>
+            </div>
+          </div>
+
+          <!-- Unallocated Money Action Strategy Card -->
+          <div class="card" id="unallocatedStrategyCard" style="display:none; border-color:rgba(16, 185, 129, 0.3); background:var(--color-green-bg);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-size:13px; font-weight:700; color:var(--color-green);">💡 Unallocated Surplus Strategy</div>
+                <div style="font-size:11px; color:var(--text-secondary);">You have unallocated funds. Where should they go?</div>
+              </div>
+              <select class="form-select" id="selectUnallocatedStrategy" style="width:auto; padding:4px 8px; font-size:12px;">
+                <option value="flexible">Flexible Spend</option>
+                <option value="savings">Protected Savings</option>
+                <option value="emergency">Emergency Fund</option>
+                <option value="unallocated">Keep Unallocated</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Category Management Toolbar -->
+          <div class="section-header">
+            <span class="section-title">All Categories (<span id="catCountSpan">10</span>)</span>
+            <button class="btn-mini" id="btnOpenNewCategoryModal">➕ Add Category</button>
+          </div>
+
+          <div id="budgetCategoryFullList">
+            <!-- Full interactive category list with edit/delete -->
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: TRANSACTIONS (Search & History)     -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-transactions">
+          <!-- Search & Filter Bar -->
+          <div class="search-filter-bar">
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="form-input" id="txSearchInput" placeholder="Search note, category, location...">
+            </div>
+            <select class="form-select" id="txTypeFilter" style="width: 105px;">
+              <option value="all">All Types</option>
+              <option value="expense">Expenses</option>
+              <option value="income">Incomes</option>
+              <option value="transfer">Transfers</option>
+            </select>
+          </div>
+
+          <!-- Secondary Filters Row -->
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <select class="form-select" id="txCategoryFilter" style="flex:1; font-size:12px; padding:6px 10px;">
+              <option value="all">All Categories</option>
+            </select>
+            <select class="form-select" id="txAccountFilter" style="flex:1; font-size:12px; padding:6px 10px;">
+              <option value="all">All Accounts</option>
+            </select>
+            <button class="btn-mini" id="btnExportTxCSV" title="Export to CSV">📥 CSV</button>
+          </div>
+
+          <!-- Transactions List Container -->
+          <div id="fullTransactionsList">
+            <!-- Dynamically populated transaction cards -->
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: GOALS (Savings & Emergency Fund)    -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-goals">
+          <!-- Emergency Fund Hero Card -->
+          <div class="card" id="emergencyFundCard" style="border: 1px solid rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.05) 100%), var(--bg-card);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:24px;">🛡️</span>
+                <div>
+                  <div style="font-size:15px; font-weight:700;">Emergency Safety Vault</div>
+                  <div style="font-size:11px; color:var(--text-muted);">Untouchable fund for unexpected student emergencies</div>
+                </div>
+              </div>
+              <span class="afford-badge badge-green" id="emergencyStatusBadge">Active</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin:12px 0 6px 0;">
+              <div>
+                <span style="font-size:11px; color:var(--text-muted);">CURRENT BALANCE</span>
+                <div style="font-size:24px; font-weight:800; color:var(--color-green);" id="emergencyCurrentVal">৳8,500</div>
+              </div>
+              <div style="text-align:right;">
+                <span style="font-size:11px; color:var(--text-muted);">TARGET GOAL</span>
+                <div style="font-size:16px; font-weight:700; color:var(--text-secondary);" id="emergencyTargetVal">৳15,000</div>
+              </div>
+            </div>
+
+            <div class="progress-bar-container" style="height:8px; margin-bottom:8px;">
+              <div class="progress-bar-fill" id="emergencyProgressFill" style="background:#10b981; width:56%;"></div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+              <span id="emergencyRemainingText">Remaining: ৳6,500</span>
+              <div style="display:flex; gap:6px;">
+                <button class="btn-mini" id="btnDepositEmergency">➕ Deposit</button>
+                <button class="btn-mini" id="btnWithdrawEmergency">➖ Withdraw</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Savings Goals Section -->
+          <div class="section-header">
+            <span class="section-title">🎯 Student Target Goals</span>
+            <button class="btn-mini" id="btnOpenNewGoalModal">➕ New Goal</button>
+          </div>
+
+          <div id="savingsGoalsFullList">
+            <!-- Dynamically populated savings goals -->
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: MORE (Tools, Reports, Wallets)     -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-more">
+          <!-- Hub Grid Navigation -->
+          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:16px;">
+            <!-- Can I Afford This Simulator -->
+            <div class="card" id="cardHubAfford" style="cursor:pointer; margin-bottom:0; padding:14px; text-align:center;">
+              <div style="font-size:26px; margin-bottom:4px;">🤔</div>
+              <div style="font-size:13px; font-weight:700;">Can I Afford This?</div>
+              <div style="font-size:10px; color:var(--text-muted);">Instant spending impact simulator</div>
+            </div>
+
+            <!-- Financial Calendar -->
+            <div class="card" id="cardHubCalendar" style="cursor:pointer; margin-bottom:0; padding:14px; text-align:center;">
+              <div style="font-size:26px; margin-bottom:4px;">🗓️</div>
+              <div style="font-size:13px; font-weight:700;">Financial Calendar</div>
+              <div style="font-size:10px; color:var(--text-muted);">Day-by-day expense timeline</div>
+            </div>
+
+            <!-- Wallets & Accounts -->
+            <div class="card" id="cardHubWallets" style="cursor:pointer; margin-bottom:0; padding:14px; text-align:center;">
+              <div style="font-size:26px; margin-bottom:4px;">💳</div>
+              <div style="font-size:13px; font-weight:700;">Wallets & Accounts</div>
+              <div style="font-size:10px; color:var(--text-muted);">bKash, Nagad, Cash, Bank</div>
+            </div>
+
+            <!-- Semester Budget Plan -->
+            <div class="card" id="cardHubSemester" style="cursor:pointer; margin-bottom:0; padding:14px; text-align:center;">
+              <div style="font-size:26px; margin-bottom:4px;">🎓</div>
+              <div style="font-size:13px; font-weight:700;">Semester Budget</div>
+              <div style="font-size:10px; color:var(--text-muted);">Multi-month university plan</div>
+            </div>
+
+            <!-- Category Analytics & Charts -->
+            <div class="card" id="cardHubAnalytics" style="cursor:pointer; margin-bottom:0; padding:14px; text-align:center;">
+              <div style="font-size:26px; margin-bottom:4px;">📈</div>
+              <div style="font-size:13px; font-weight:700;">Charts & Insights</div>
+              <div style="font-size:10px; color:var(--text-muted);">Donut, Trends & Spending Pace</div>
+            </div>
+
+            <!-- Monthly Financial Report -->
+            <div class="card" id="cardHubReport" style="cursor:pointer; margin-bottom:0; padding:14px; text-align:center;">
+              <div style="font-size:26px; margin-bottom:4px;">📑</div>
+              <div style="font-size:13px; font-weight:700;">Monthly Report</div>
+              <div style="font-size:10px; color:var(--text-muted);">Summary & Export PDF/Print</div>
+            </div>
+          </div>
+
+          <!-- Section: Backup, PIN, Settings -->
+          <div class="section-header">
+            <span class="section-title">⚙️ App Settings & Data</span>
+          </div>
+
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border-subtle);">
+              <div>
+                <div style="font-size:13px; font-weight:700;">Currency Symbol</div>
+                <div style="font-size:11px; color:var(--text-muted);">Default: ৳ (Bangladeshi Taka)</div>
+              </div>
+              <select class="form-select" id="selectAppCurrency" style="width:90px; padding:4px 8px; font-size:12px;">
+                <option value="৳">৳ (BDT)</option>
+                <option value="$">$ (USD)</option>
+                <option value="€">€ (EUR)</option>
+                <option value="£">£ (GBP)</option>
+                <option value="₹">₹ (INR)</option>
+              </select>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border-subtle);">
+              <div>
+                <div style="font-size:13px; font-weight:700;">App Security PIN Lock</div>
+                <div style="font-size:11px; color:var(--text-muted);">Protect your finances with a 4-digit code</div>
+              </div>
+              <button class="btn-mini" id="btnConfigurePIN">Setup PIN</button>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border-subtle);">
+              <div>
+                <div style="font-size:13px; font-weight:700;">Backup & Restore</div>
+                <div style="font-size:11px; color:var(--text-muted);">Export data backup or restore JSON</div>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn-mini" id="btnExportJSON">Backup</button>
+                <button class="btn-mini" id="btnImportJSON">Restore</button>
+                <input type="file" id="fileRestoreInput" accept=".json" style="display:none;">
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-size:13px; font-weight:700; color:var(--color-red);">Reset / Demo Student Data</div>
+                <div style="font-size:11px; color:var(--text-muted);">Reload authentic student dataset or clear</div>
+              </div>
+              <button class="btn-mini btn-danger" id="btnReloadDemoData">Reload Demo</button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Floating Action Button (+ Add Expense) -->
+      <div class="fab-container">
+        <button class="fab-btn" id="btnFloatingAddExpense" title="Quick Expense Entry">
+          <span style="font-size:18px;">➕</span>
+          <span>Add Expense</span>
+        </button>
+      </div>
+
+      <!-- Bottom Navigation Bar -->
+      <nav class="bottom-nav" id="bottomNav">
+        <button class="nav-item active" data-tab="view-home">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item" data-tab="view-budget">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Budget</span>
+        </button>
+        <button class="nav-item" data-tab="view-transactions">
+          <span class="nav-icon">💳</span>
+          <span class="nav-label">History</span>
+        </button>
+        <button class="nav-item" data-tab="view-goals">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-label">Goals</span>
+        </button>
+        <button class="nav-item" data-tab="view-more">
+          <span class="nav-icon">⚡</span>
+          <span class="nav-label">More</span>
+        </button>
+      </nav>
+
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- MODALS & DIALOGS                                        -->
+  <!-- ======================================================= -->
+
+  <!-- 1. Quick Add Expense Modal (< 5 seconds) -->
+  <div class="modal-overlay" id="modalAddExpense">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title">💸 Quick Expense</span>
+        <button class="icon-btn" id="btnCloseExpenseModal">✕</button>
+      </div>
+      <form id="formAddExpense">
+        <!-- Amount Input Field -->
+        <div class="form-group">
+          <label class="form-label" for="expenseAmount">Amount (<span class="currency-symbol">৳</span>)</label>
+          <input type="number" step="any" min="1" class="form-input" id="expenseAmount" placeholder="e.g. 180" style="font-size:24px; font-weight:800; text-align:center;" required autofocus>
+        </div>
+
+        <!-- Category Picker Grid -->
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <div class="category-picker-grid" id="expenseCategoryPicker">
+            <!-- Populated dynamically with category tiles -->
+          </div>
+        </div>
+
+        <!-- Note & Date -->
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label class="form-label" for="expenseNote">Note / Description</label>
+            <input type="text" class="form-input" id="expenseNote" placeholder="e.g. Lunch with roommates">
+          </div>
+          <div class="form-group" style="flex:1.2;">
+            <label class="form-label" for="expenseDate">Date</label>
+            <input type="date" class="form-input" id="expenseDate" required>
+          </div>
+        </div>
+
+        <!-- Payment Method Account Pills -->
+        <div class="form-group">
+          <label class="form-label">Paid From (Account / Wallet)</label>
+          <div class="pill-selector-group" id="expenseAccountPicker">
+            <!-- Populated dynamically with accounts -->
+          </div>
+        </div>
+
+        <!-- Optional Location & Recurring -->
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label" for="expenseLocation">Location (Optional)</label>
+            <input type="text" class="form-input" id="expenseLocation" placeholder="e.g. TSC Canteen">
+          </div>
+          <div class="form-group" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+            <label style="font-size:12px; font-weight:600; color:var(--text-secondary); display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="expenseIsRecurring"> Recurring expense
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:10px;">
+          <span>💾 Save Expense</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Quick Add Income Modal -->
+  <div class="modal-overlay" id="modalAddIncome">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title">💰 Add Income</span>
+        <button class="icon-btn" id="btnCloseIncomeModal">✕</button>
+      </div>
+      <form id="formAddIncome">
+        <div class="form-group">
+          <label class="form-label" for="incomeAmount">Amount (<span class="currency-symbol">৳</span>)</label>
+          <input type="number" step="any" min="1" class="form-input" id="incomeAmount" placeholder="e.g. 5000" style="font-size:24px; font-weight:800; text-align:center;" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Income Source</label>
+          <div class="pill-selector-group" id="incomeSourcePicker">
+            <div class="pill-item selected" data-source="Monthly Allowance">👨‍👩‍👦 Allowance</div>
+            <div class="pill-item" data-source="Tuition Income">📖 Tuition</div>
+            <div class="pill-item" data-source="Part-time Job">💼 Part-time</div>
+            <div class="pill-item" data-source="Freelance">💻 Freelance</div>
+            <div class="pill-item" data-source="Scholarship">🎓 Scholarship</div>
+            <div class="pill-item" data-source="Gift">🎁 Gift</div>
+            <div class="pill-item" data-source="Other Income">✨ Other</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label class="form-label" for="incomeNote">Note</label>
+            <input type="text" class="form-input" id="incomeNote" placeholder="e.g. Monthly stipend from father">
+          </div>
+          <div class="form-group" style="flex:1.2;">
+            <label class="form-label" for="incomeDate">Date</label>
+            <input type="date" class="form-input" id="incomeDate" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Deposit To Account</label>
+          <div class="pill-selector-group" id="incomeAccountPicker">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:10px;">
+          <span>💾 Record Income</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. "Can I Afford This?" Decision Tool Modal -->
+  <div class="modal-overlay" id="modalAffordTool">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title">🤔 "Can I Afford This?"</span>
+        <button class="icon-btn" id="btnCloseAffordModal">✕</button>
+      </div>
+      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+        Test a purchase before spending. Khoroch calculates the exact impact on your daily survival limit and fixed obligations.
+      </p>
+
+      <form id="formAffordSimulator">
+        <div class="form-group">
+          <label class="form-label" for="affordItemTitle">What do you want to buy?</label>
+          <input type="text" class="form-input" id="affordItemTitle" placeholder="e.g. Bluetooth Headphones, New Shoes, Concert Ticket" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:1.2;">
+            <label class="form-label" for="affordItemPrice">Price (<span class="currency-symbol">৳</span>)</label>
+            <input type="number" min="1" step="any" class="form-input" id="affordItemPrice" placeholder="e.g. 800" required>
+          </div>
+          <div class="form-group" style="flex:1.5;">
+            <label class="form-label" for="affordCategorySelect">Category</label>
+            <select class="form-select" id="affordCategorySelect">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:6px;">
+          <span>⚡ Check Affordability</span>
+        </button>
+      </form>
+
+      <!-- Affordability Analysis Result Card -->
+      <div class="afford-result-box" id="affordResultBox" style="display:none;">
+        <div class="afford-header">
+          <span style="font-size:14px; font-weight:700;" id="affordResultTitle">Analysis</span>
+          <span class="afford-badge" id="affordResultBadge">Result</span>
+        </div>
+        <p style="font-size:13px; margin-bottom:12px; line-height:1.4;" id="affordResultMessage">Feedback text</p>
+
+        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; padding-top:10px; border-top:1px solid var(--border-subtle);">
+          <div>
+            <div class="hero-meta-title">Safe Daily Allowance</div>
+            <div style="font-size:14px; font-weight:700;" id="affordDailyComparison">৳300 ➔ ৳260</div>
+          </div>
+          <div>
+            <div class="hero-meta-title">Category Remaining</div>
+            <div style="font-size:14px; font-weight:700;" id="affordCatComparison">৳1,500 ➔ ৳700</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Transfer Between Accounts Modal -->
+  <div class="modal-overlay" id="modalTransfer">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title">🔄 Transfer Between Accounts</span>
+        <button class="icon-btn" id="btnCloseTransferModal">✕</button>
+      </div>
+      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+        Transfers move money between your cash, bKash, Nagad, or bank without counting as an expense.
+      </p>
+      <form id="formTransfer">
+        <div class="form-group">
+          <label class="form-label" for="transferAmount">Transfer Amount (<span class="currency-symbol">৳</span>)</label>
+          <input type="number" step="any" min="1" class="form-input" id="transferAmount" placeholder="e.g. 500" style="font-size:22px; font-weight:800; text-align:center;" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="transferSourceSelect">From Account</label>
+            <select class="form-select" id="transferSourceSelect" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="transferDestSelect">To Account</label>
+            <select class="form-select" id="transferDestSelect" required></select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="transferNote">Note (Optional)</label>
+          <input type="text" class="form-input" id="transferNote" placeholder="e.g. Cash out to bKash for hall dining">
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:6px;">
+          <span>Transfer Now</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Category Editor Modal (Create/Edit) -->
+  <div class="modal-overlay" id="modalCategory">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title" id="catModalTitle">🏷️ Add Category</span>
+        <button class="icon-btn" id="btnCloseCatModal">✕</button>
+      </div>
+      <form id="formCategory">
+        <input type="hidden" id="catEditId">
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label class="form-label" for="catNameInput">Category Name</label>
+            <input type="text" class="form-input" id="catNameInput" placeholder="e.g. Hall Dining" required>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label class="form-label" for="catIconInput">Icon (Emoji)</label>
+            <input type="text" class="form-input" id="catIconInput" placeholder="🍛" style="text-align:center;" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:1.5;">
+            <label class="form-label" for="catBudgetInput">Monthly Budget (<span class="currency-symbol">৳</span>)</label>
+            <input type="number" min="0" step="any" class="form-input" id="catBudgetInput" placeholder="e.g. 5000" required>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label class="form-label" for="catColorInput">Color</label>
+            <input type="color" class="form-input" id="catColorInput" value="#6366f1" style="height:42px; padding:2px;">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:14px; margin-bottom:14px;">
+          <label style="font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <input type="checkbox" id="catIsEssential"> ⭐ Essential Expense
+          </label>
+          <label style="font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <input type="checkbox" id="catIsFixed"> 🔒 Fixed Monthly Dues
+          </label>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button type="submit" class="btn-primary" style="flex:2;">Save Category</button>
+          <button type="button" class="btn-secondary btn-danger" id="btnDeleteCategory" style="flex:1; display:none;">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. Savings Goal Modal (Create/Edit/Deposit) -->
+  <div class="modal-overlay" id="modalGoal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title" id="goalModalTitle">🎯 Create Savings Goal</span>
+        <button class="icon-btn" id="btnCloseGoalModal">✕</button>
+      </div>
+      <form id="formGoal">
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label class="form-label" for="goalNameInput">Goal Name</label>
+            <input type="text" class="form-input" id="goalNameInput" placeholder="e.g. New Coding Laptop" required>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label class="form-label" for="goalIconInput">Icon</label>
+            <input type="text" class="form-input" id="goalIconInput" placeholder="💻" style="text-align:center;" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="goalTargetInput">Target Amount (<span class="currency-symbol">৳</span>)</label>
+            <input type="number" min="100" class="form-input" id="goalTargetInput" placeholder="e.g. 80000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="goalCurrentInput">Initial Saved (<span class="currency-symbol">৳</span>)</label>
+            <input type="number" min="0" class="form-input" id="goalCurrentInput" placeholder="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="goalDateInput">Target Date</label>
+          <input type="date" class="form-input" id="goalDateInput">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="goalNotesInput">Purpose / Notes</label>
+          <input type="text" class="form-input" id="goalNotesInput" placeholder="e.g. Need for final year project">
+        </div>
+
+        <button type="submit" class="btn-primary">Save Goal</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Deposit / Withdraw Modal for Savings Goals -->
+  <div class="modal-overlay" id="modalGoalDeposit">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title" id="depositModalTitle">💰 Deposit to Goal</span>
+        <button class="icon-btn" id="btnCloseDepositModal">✕</button>
+      </div>
+      <form id="formGoalDeposit">
+        <input type="hidden" id="depositGoalId">
+        <input type="hidden" id="depositActionType" value="deposit">
+
+        <div class="form-group">
+          <label class="form-label" for="depositAmount">Amount (<span class="currency-symbol">৳</span>)</label>
+          <input type="number" min="1" step="any" class="form-input" id="depositAmount" placeholder="e.g. 1000" style="font-size:24px; font-weight:800; text-align:center;" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" id="depositAccountLabel">From Account</label>
+          <select class="form-select" id="depositAccountSelect" required></select>
+        </div>
+
+        <button type="submit" class="btn-primary" id="btnConfirmDeposit">Confirm Deposit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. Add Upcoming Bill Modal -->
+  <div class="modal-overlay" id="modalAddBill">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title">🔔 Add Upcoming Bill / Due</span>
+        <button class="icon-btn" id="btnCloseBillModal">✕</button>
+      </div>
+      <form id="formAddBill">
+        <div class="form-group">
+          <label class="form-label" for="billTitleInput">Bill Title</label>
+          <input type="text" class="form-input" id="billTitleInput" placeholder="e.g. Room Rent, WiFi, Mess Token" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="billAmountInput">Amount (<span class="currency-symbol">৳</span>)</label>
+            <input type="number" min="1" step="any" class="form-input" id="billAmountInput" placeholder="6000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="billDueDateInput">Due Date</label>
+            <input type="date" class="form-input" id="billDueDateInput" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label class="form-label" for="billCategorySelect">Category</label>
+            <select class="form-select" id="billCategorySelect" required></select>
+          </div>
+          <div class="form-group" style="flex:1; display:flex; align-items:center;">
+            <label style="font-size:12px; font-weight:600; cursor:pointer;">
+              <input type="checkbox" id="billIsRecurring" checked> Recurring Monthly
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Add Bill to Calendar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. Month Reset & Carry-Over Wizard Modal -->
+  <div class="modal-overlay" id="modalMonthReset">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title">🗓️ Monthly Reset & Carry-Over</span>
+        <button class="icon-btn" id="btnCloseMonthResetModal">✕</button>
+      </div>
+      <p style="font-size:13px; color:var(--text-secondary); margin-bottom:14px; line-height:1.4;">
+        Start a fresh month with your recurring student budgets, fixed rent/bills, and decide what happens to your leftover money.
+      </p>
+
+      <form id="formMonthReset">
+        <div class="form-group">
+          <label class="form-label" for="newMonthInput">New Month</label>
+          <input type="month" class="form-input" id="newMonthInput" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Unspent Balance Strategy</label>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <label class="card" style="padding:10px 14px; margin-bottom:0; display:flex; gap:10px; cursor:pointer;">
+              <input type="radio" name="carryStrategy" value="carry" checked>
+              <div>
+                <div style="font-size:13px; font-weight:700;">Carry Over to Next Month</div>
+                <div style="font-size:11px; color:var(--text-muted);">Keep leftover money in your available spending balance</div>
+              </div>
+            </label>
+
+            <label class="card" style="padding:10px 14px; margin-bottom:0; display:flex; gap:10px; cursor:pointer;">
+              <input type="radio" name="carryStrategy" value="savings">
+              <div>
+                <div style="font-size:13px; font-weight:700;">Auto-Deposit to Emergency/Savings</div>
+                <div style="font-size:11px; color:var(--text-muted);">Reward your discipline by storing unspent money in savings</div>
+              </div>
+            </label>
+
+            <label class="card" style="padding:10px 14px; margin-bottom:0; display:flex; gap:10px; cursor:pointer;">
+              <input type="radio" name="carryStrategy" value="reset">
+              <div>
+                <div style="font-size:13px; font-weight:700;">Reset Balances</div>
+                <div style="font-size:11px; color:var(--text-muted);">Start fresh with solely next month's allowance</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:10px;">
+          <span>Start New Month</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 10. Financial Calendar Modal -->
+  <div class="modal-overlay" id="modalCalendarView">
+    <div class="modal-sheet" style="max-width:500px;">
+      <div class="modal-header">
+        <span class="modal-title">🗓️ Financial Activity Calendar</span>
+        <button class="icon-btn" id="btnCloseCalendarModal">✕</button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span style="font-size:14px; font-weight:700;" id="calMonthTitle">September 2026</span>
+        <span style="font-size:11px; color:var(--text-muted);">Tap a day to inspect</span>
+      </div>
+
+      <!-- Calendar Day Names -->
+      <div class="calendar-grid" style="margin-bottom:4px;">
+        <div class="cal-header-day">Su</div>
+        <div class="cal-header-day">Mo</div>
+        <div class="cal-header-day">Tu</div>
+        <div class="cal-header-day">We</div>
+        <div class="cal-header-day">Th</div>
+        <div class="cal-header-day">Fr</div>
+        <div class="cal-header-day">Sa</div>
+      </div>
+
+      <!-- Calendar Days Grid -->
+      <div class="calendar-grid" id="calendarDaysGrid">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Day Inspection Drawer Content -->
+      <div id="calendarDayDetails" style="margin-top:14px; border-top:1px solid var(--border-subtle); padding-top:12px;">
+        <div style="font-size:13px; font-weight:700; margin-bottom:6px;" id="calSelectedDateTitle">Select a date</div>
+        <div id="calSelectedDateItems" style="font-size:12px; color:var(--text-secondary);">
+          Tap on any date cell above to inspect the day's expenses, incomes, and bills.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. Wallets & Accounts Management Modal -->
+  <div class="modal-overlay" id="modalWalletsView">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title">💳 Wallets & Accounts</span>
+        <button class="icon-btn" id="btnCloseWalletsModal">✕</button>
+      </div>
+
+      <div class="card" style="margin-bottom:12px; background:var(--accent-card-gradient), var(--bg-card);">
+        <div class="hero-meta-title">TOTAL WALLET LIQUIDITY</div>
+        <div style="font-size:26px; font-weight:800;" id="walletTotalSum">৳8,500</div>
+      </div>
+
+      <div class="section-header" style="margin-top:0;">
+        <span class="section-title">Your Payment Accounts</span>
+        <button class="btn-mini" id="btnOpenTransferFromWallets">🔄 Transfer</button>
+      </div>
+
+      <div id="walletAccountsList">
+        <!-- Dynamically rendered accounts -->
+      </div>
+
+      <button class="btn-secondary" id="btnAddNewAccount" style="margin-top:8px;">➕ Add Another Account / Card</button>
+    </div>
+  </div>
+
+  <!-- 12. Semester Budget Planner Modal -->
+  <div class="modal-overlay" id="modalSemesterView">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span class="modal-title">🎓 Semester Budget Planner</span>
+        <button class="icon-btn" id="btnCloseSemesterModal">✕</button>
+      </div>
+      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
+        Plan across the entire academic term (e.g. 4 months) to ensure you have enough money through finals week.
+      </p>
+
+      <div class="card" style="border:1px solid rgba(99, 102, 241, 0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+          <div>
+            <div class="hero-meta-title" id="semesterNameDisplay">Autumn Semester 2026</div>
+            <div style="font-size:22px; font-weight:800;" id="semesterTotalBudget">৳80,000</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="hero-meta-title">MONTHLY ALLOCATION</div>
+            <div style="font-size:16px; font-weight:700; color:var(--color-blue);" id="semesterMonthlyAvg">৳20,000/mo</div>
+          </div>
+        </div>
+
+        <div class="progress-bar-container" style="height:8px; margin-bottom:8px;">
+          <div class="progress-bar-fill" id="semesterProgressFill" style="background:var(--accent-gradient); width:40%;"></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; font-size:12px;">
+          <span id="semesterSpentText">Spent so far: ৳32,000</span>
+          <span id="semesterRemainingText" style="font-weight:700; color:var(--color-green);">Remaining: ৳48,000</span>
+        </div>
+      </div>
+
+      <form id="formSemesterConfig">
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label class="form-label" for="inputSemesterName">Semester Title</label>
+            <input type="text" class="form-input" id="inputSemesterName" value="Autumn Semester 2026">
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label class="form-label" for="inputSemesterMonths">Months</label>
+            <input type="number" min="1" max="12" class="form-input" id="inputSemesterMonths" value="4">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="inputSemesterBudget">Total Term Budget (<span class="currency-symbol">৳</span>)</label>
+          <input type="number" min="1000" class="form-input" id="inputSemesterBudget" value="80000">
+        </div>
+        <button type="submit" class="btn-primary">Update Semester Plan</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 13. Monthly Financial Report & Analytics Modal -->
+  <div class="modal-overlay" id="modalReportView">
+    <div class="modal-sheet" style="max-width:540px;">
+      <div class="modal-header">
+        <span class="modal-title">📑 Monthly Financial Statement</span>
+        <button class="icon-btn" id="btnCloseReportModal">✕</button>
+      </div>
+
+      <div id="printableReportArea">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div>
+            <h2 style="font-size:18px; font-weight:800;" id="reportMonthHeading">September 2026 Report</h2>
+            <div style="font-size:11px; color:var(--text-muted);">University Student Personal Finance Ledger</div>
+          </div>
+          <span class="afford-badge badge-green" id="reportHealthBadge">Balanced</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:14px;">
+          <div class="card" style="padding:10px; margin-bottom:0; text-align:center;">
+            <div class="hero-meta-title">TOTAL INCOME</div>
+            <div style="font-size:15px; font-weight:700; color:var(--color-green);" id="reportIncomeVal">৳0</div>
+          </div>
+          <div class="card" style="padding:10px; margin-bottom:0; text-align:center;">
+            <div class="hero-meta-title">TOTAL SPENT</div>
+            <div style="font-size:15px; font-weight:700; color:var(--color-red);" id="reportSpentVal">৳0</div>
+          </div>
+          <div class="card" style="padding:10px; margin-bottom:0; text-align:center;">
+            <div class="hero-meta-title">NET SURPLUS</div>
+            <div style="font-size:15px; font-weight:700; color:var(--color-blue);" id="reportSurplusVal">৳0</div>
+          </div>
+        </div>
+
+        <!-- Donut Chart & Category Breakdown -->
+        <div class="card" style="margin-bottom:12px;">
+          <div style="font-size:13px; font-weight:700; margin-bottom:8px;">Spending Breakdown</div>
+          <canvas id="reportDonutChart" height="220" style="width:100%; height:220px;"></canvas>
+          <div id="reportCategoryBreakdownTable" style="margin-top:12px; font-size:12px;">
+            <!-- Category items with percentages -->
+          </div>
+        </div>
+
+        <!-- Smart Insights List -->
+        <div class="card" style="margin-bottom:14px;">
+          <div style="font-size:13px; font-weight:700; margin-bottom:8px;">💡 Financial Takeaways</div>
+          <ul id="reportInsightsList" style="padding-left:18px; font-size:12px; line-height:1.5; color:var(--text-secondary);">
+          </ul>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px;">
+        <button class="btn-primary" id="btnPrintReport">🖨️ Print / Save PDF</button>
+        <button class="btn-secondary" id="btnExportReportCSV">Export CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14. PIN Security Screen Overlay (when PIN lock enabled) -->
+  <div class="pin-overlay" id="pinLockScreen" style="display:none;">
+    <div style="font-size:32px; margin-bottom:8px;">🔒</div>
+    <h2 style="font-size:18px; font-weight:700; margin-bottom:4px;">Khoroch Locked</h2>
+    <p style="font-size:12px; color:var(--text-secondary);">Enter your 4-digit PIN to access your finances</p>
+
+    <div class="pin-dots">
+      <div class="pin-dot" id="pindot-1"></div>
+      <div class="pin-dot" id="pindot-2"></div>
+      <div class="pin-dot" id="pindot-3"></div>
+      <div class="pin-dot" id="pindot-4"></div>
+    </div>
+
+    <div class="pin-pad">
+      <button class="pin-btn" data-key="1">1</button>
+      <button class="pin-btn" data-key="2">2</button>
+      <button class="pin-btn" data-key="3">3</button>
+      <button class="pin-btn" data-key="4">4</button>
+      <button class="pin-btn" data-key="5">5</button>
+      <button class="pin-btn" data-key="6">6</button>
+      <button class="pin-btn" data-key="7">7</button>
+      <button class="pin-btn" data-key="8">8</button>
+      <button class="pin-btn" data-key="9">9</button>
+      <button class="pin-btn" data-key="clear" style="font-size:16px;">Clear</button>
+      <button class="pin-btn" data-key="0">0</button>
+      <button class="pin-btn" data-key="backspace" style="font-size:16px;">⌫</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- App Core JavaScript Logic Modules (Universal, Offline & Zero-CORS) -->
+  <script src="js/store.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
